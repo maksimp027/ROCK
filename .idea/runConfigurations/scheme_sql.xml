@@ -1,0 +1,8 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="scheme.sql" type="DatabaseScript" editBeforeRun="true" nameIsGenerated="true">
+    <script-file value="$PROJECT_DIR$/scheme.sql" />
+    <script-mode>FILE</script-mode>
+    <data-source id="54f6c745-b0b3-4152-b458-1b0c1a24e161" namespace="database/&quot;postgres&quot;/schema/&quot;public&quot;" />
+    <method v="2" />
+  </configuration>
+</component>
