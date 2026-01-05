@@ -1,0 +1,31 @@
+services:
+  # Сервіс бази даних
+  db:
+    image: postgres:15
+    container_name: rock_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Сервіс нашого API
+  api:
+    build: .
+    container_name: rock_api
+    depends_on:
+      - db
+    ports:
+      - "8001:8001"
+    env_file:
+      - .env
+    environment:
+      # Важливо: хост тепер не 'localhost', а назва сервісу 'db'
+      DB_HOST: db
+
+volumes:
+  postgres_data:

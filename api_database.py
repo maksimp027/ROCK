@@ -1,77 +1,58 @@
 import asyncpg
-import os
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
+from config import settings
 
-# --- НАЛАШТУВАННЯ БАЗИ ДАНИХ ---
-# Беремо ті самі налаштування, що й у load_to_db.py
-DB_CONFIG = {
-    "database": "postgres",       # База, де лежать ваші таблиці
-    "user": "postgres",
-    "password": "123",  # <-- !!! ВАШ ПАРОЛЬ ТУТ !!!
-    "host": "localhost",
-    "port": 5432
-}
-# --------------------------------
-
-# Глобальна змінна для зберігання "пулу" з'єднань
-# 'pool' - це набір готових, відкритих з'єднань з БД
+# Initialize pool globally
 pool = None
 
+engine = create_async_engine(
+    f"postgresql+asyncpg://{settings.db_user}:{settings.db_password}@{settings.db_host}:{settings.db_port}/{settings.db_name}"
+)
+
+async_session = async_sessionmaker(engine, expire_on_commit=False)
+
+async def get_db() -> AsyncSession:
+    """SQLAlchemy session dependency"""
+    async with async_session() as session:
+        yield session
+
 async def get_db_pool():
-    """
-    Повертає глобальний пул з'єднань.
-    Якщо він ще не створений, створює його.
-    """
+    """Initialize asyncpg connection pool"""
     global pool
     if pool is None:
-        print("Створюю новий пул з'єднань з БД...")
         try:
             pool = await asyncpg.create_pool(
-                user=DB_CONFIG["user"],
-                password=DB_CONFIG["password"],
-                host=DB_CONFIG["host"],
-                port=DB_CONFIG["port"],
-                database=DB_CONFIG["database"],
-                min_size=5,  # 5 з'єднань будуть готові одразу
-                max_size=20  # До 20 одночасних з'єднань
+                user=settings.db_user,
+                password=settings.db_password,
+                host=settings.db_host,
+                port=settings.db_port,
+                database=settings.db_name,
+                min_size=5,
+                max_size=20
             )
-            print("Пул з'єднань успішно створено.")
+            print("Connection pool created successfully.")
         except Exception as e:
-            print(f"ПОМИЛКА: Не вдалося створити пул з'єднань: {e}")
-            # Це критична помилка, сервер не зможе запуститися
+            print(f"ERROR creating pool: {e}")
             raise
     return pool
 
 async def close_db_pool():
-    """
-    Закриває пул з'єднань при зупинці сервера.
-    """
+    """Close connection pool"""
     global pool
     if pool:
-        print("Закриваю пул з'єднань з БД...")
+        print("Closing database pool...")
         await pool.close()
         pool = None
-        print("Пул з'єднань закрито.")
-
-# --- Функція-помічник для запитів ---
-# Це зекономить нам багато часу:
-# вона бере з'єднання з пулу, виконує запит і повертає результат
+        print("Pool closed.")
 
 async def fetch_all(query: str, *args):
-    """
-    Виконує запит (SELECT) і повертає ВСІ рядки.
-    """
+    """Execute SELECT query and return all rows"""
     db_pool = await get_db_pool()
     async with db_pool.acquire() as connection:
-        # asyncpg.Record повертає об'єкти, схожі на dict,
-        # що дуже зручно для перетворення в JSON
-        records = await connection.fetch(query, *args)
-        return records
+        return await connection.fetch(query, *args)
 
 async def fetch_one(query: str, *args):
-    """
-    Виконує запит (SELECT) і повертає ОДИН рядок.
-    """
+    """Execute SELECT query and return one row"""
     db_pool = await get_db_pool()
     async with db_pool.acquire() as connection:
-        record = await connection.fetchrow(query, *args)
-        return record
+        return await connection.fetchrow(query, *args)

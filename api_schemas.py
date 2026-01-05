@@ -2,13 +2,10 @@ from pydantic import BaseModel, ConfigDict
 from datetime import date
 from typing import List, Optional
 
-# Pydantic (на відміну від SQL) не любить 'orm_mode = True'
-# Тепер ми використовуємо 'ConfigDict'
 model_config = ConfigDict(from_attributes=True)
 
 
-# --- Базові моделі (для вкладення) ---
-# Описують окремі частини наших таблиць
+# --- Base Models ---
 
 class ArtistBase(BaseModel):
     model_config = model_config
@@ -30,65 +27,101 @@ class SetlistItemBase(BaseModel):
     is_cover: bool
 
 
-# --- Моделі для відповідей (Response Models) ---
-# Це те, що наш API буде реально відправляти у JSON
+# --- Response Models ---
 
 class ConcertBasicInfo(BaseModel):
-    """
-    Скорочена інформація про концерт (для списків).
-    """
     model_config = model_config
     concert_id: str
     concert_date: date
-    tour_name: Optional[str] = None  # 'None' дозволяє полю бути null
+    tour_name: Optional[str] = None
     venue_name: str
     city_name: str
     country_name: str
 
 
 class ConcertDetail(BaseModel):
-    """
-    Повна, детальна інформація про ОДИН концерт.
-    """
     model_config = model_config
     concert_id: str
     concert_date: date
     tour_name: Optional[str] = None
-
-    # Вкладені об'єкти
     artist: ArtistBase
     venue: VenueBase
-
-    # Список пісень
     setlist: List[SetlistItemBase] = []
 
 
 class ArtistDetail(BaseModel):
-    """
-    Повна, детальна інформація про ОДНОГО артиста.
-    """
     model_config = model_config
     artist: ArtistBase
-
-    # Список його концертів
     concerts: List[ConcertBasicInfo] = []
 
 
-# --- Моделі для статистики ---
+# --- Statistics ---
 
 class StatTopItem(BaseModel):
-    """
-    Універсальна модель для "Топ-10" (напр. 'Metallica', 150)
-    """
     model_config = model_config
     name: str
     count: int
 
 
 class StatYearItem(BaseModel):
-    """
-    Модель для статистики по роках (напр. '2023', 500)
-    """
     model_config = model_config
     year: int
     count: int
+
+
+class StatGeoItem(BaseModel):
+    model_config = model_config
+    name: str
+    count: int
+
+
+class StatHeatmapItem(BaseModel):
+    model_config = model_config
+    year: int
+    month: int
+    count: int
+
+
+# --- External API Models (moved from make_data.py) ---
+
+class ExternalArtist(BaseModel):
+    mbid: str
+    name: str
+
+
+class ExternalCountry(BaseModel):
+    code: str
+    name: str
+
+
+class ExternalCity(BaseModel):
+    name: str
+    country: ExternalCountry
+
+
+class ExternalVenue(BaseModel):
+    name: str
+    city: ExternalCity
+
+
+class ExternalSong(BaseModel):
+    name: str
+
+
+class ExternalSet(BaseModel):
+    song: List[ExternalSong] = []
+
+
+class ExternalSets(BaseModel):
+    set: List[ExternalSet] = []
+
+
+class ExternalSetlist(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
+    id: str
+    eventDate: str
+    artist: ExternalArtist
+    venue: ExternalVenue
+    sets: Optional[ExternalSets] = None
+    tour: Optional[dict] = None

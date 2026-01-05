@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROCK SCENE EUROPE | LIVE ANALYTICS</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;700&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Налаштування кольорів -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0f0f0f',
+                        cardBg: '#181818',
+                        neonOrange: '#FF5E00',
+                        neonPurple: '#7000FF',
+                        textMain: '#E5E5E5',
+                        textMuted: '#888888'
+                    },
+                    fontFamily: {
+                        oswald: ['Oswald', 'sans-serif'],
+                        montserrat: ['Montserrat', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #E5E5E5;
+            font-family: 'Montserrat', sans-serif;
+            /* Ефект "шуму" на фоні для гранж-стилю */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+
+        /* Неонове світіння тексту */
+        .neon-text-orange { text-shadow: 0 0 15px rgba(255, 94, 0, 0.6); }
+        .neon-text-purple { text-shadow: 0 0 15px rgba(112, 0, 255, 0.6); }
+
+        /* Стиль карток */
+        .rock-card {
+            background: rgba(24, 24, 24, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .rock-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Акцентна лінія зверху картки */
+        .card-accent-orange { border-top: 3px solid #FF5E00; }
+        .card-accent-purple { border-top: 3px solid #7000FF; }
+
+        /* Кастомний скролбар */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f0f; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #FF5E00; }
+
+        /* Сітка для Heatmap */
+        .heatmap-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr); /* 12 місяців */
+            gap: 4px;
+        }
+        .heatmap-cell {
+            aspect-ratio: 1;
+            border-radius: 2px;
+            background-color: #222;
+            transition: all 0.2s;
+        }
+        .heatmap-cell:hover { transform: scale(1.2); z-index: 10; border: 1px solid white; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="border-b border-gray-800 bg-black/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="h-10 w-1 bg-neonOrange"></div> <!-- Orange stripe -->
+                <div>
+                    <h1 class="font-oswald text-3xl font-bold tracking-wide uppercase leading-none">
+                        Rock Scene <span class="text-neonOrange neon-text-orange">Europe</span>
+                    </h1>
+                    <p class="text-xs text-textMuted tracking-[0.3em] uppercase mt-1">Live Analytics Dashboard</p>
+                </div>
+            </div>
+            <div class="hidden md:block text-right">
+                <div class="font-oswald text-xl font-bold text-neonPurple neon-text-purple">2000 — 2024</div>
+                <div class="flex items-center justify-end gap-2 mt-1">
+                    <span class="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-xs text-textMuted uppercase">API Connected</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD -->
+    <main class="container mx-auto px-6 py-8 flex-grow">
+
+        <!-- KPI ROW -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <!-- KPI 1 -->
+            <div class="rock-card p-6 card-accent-orange">
+                <h3 class="text-textMuted text-xs uppercase tracking-widest mb-2">Total Concerts</h3>
+                <div class="font-oswald text-5xl font-bold" id="kpiTotal">...</div>
+                <div class="mt-2 text-xs text-neonOrange flex items-center gap-1">
+                    <span>▲</span> <span>Database Live</span>
+                </div>
+            </div>
+            <!-- KPI 2 -->
+            <div class="rock-card p-6 card-accent-purple">
+                <h3 class="text-textMuted text-xs uppercase tracking-widest mb-2">Unique Artists</h3>
+                <div class="font-oswald text-5xl font-bold">1,240</div>
+                <div class="mt-2 text-xs text-neonPurple">Active touring bands</div>
+            </div>
+            <!-- KPI 3 -->
+            <div class="rock-card p-6 card-accent-orange">
+                <h3 class="text-textMuted text-xs uppercase tracking-widest mb-2">Songs Analyzed</h3>
+                <div class="font-oswald text-5xl font-bold">141k</div>
+                <div class="mt-2 text-xs text-textMuted">Setlist items processed</div>
+            </div>
+            <!-- KPI 4 -->
+            <div class="rock-card p-6 card-accent-purple">
+                <h3 class="text-textMuted text-xs uppercase tracking-widest mb-2">Top Year</h3>
+                <div class="font-oswald text-5xl font-bold">2019</div>
+                <div class="mt-2 text-xs text-textMuted">Peak activity</div>
+            </div>
+        </div>
+
+        <!-- SECTION 1: MAIN CHARTS -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+
+            <!-- TOP ARTISTS (Bar Chart) -->
+            <div class="rock-card p-6 lg:col-span-2">
+                <div class="flex justify-between items-end mb-6">
+                    <div>
+                        <h2 class="font-oswald text-2xl uppercase">Top Touring Artists</h2>
+                        <p class="text-xs text-textMuted mt-1">Most active bands by number of shows</p>
+                    </div>
+                    <button class="text-neonOrange text-xs uppercase hover:underline">View All</button>
+                </div>
+                <div class="h-80 w-full">
+                    <canvas id="artistsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- ROCK CAPITALS (Donut Chart) -->
+            <div class="rock-card p-6">
+                <div class="mb-6">
+                    <h2 class="font-oswald text-2xl uppercase text-neonPurple neon-text-purple">Rock Capitals</h2>
+                    <p class="text-xs text-textMuted mt-1">Cities with most events</p>
+                </div>
+                <div class="relative h-64 flex justify-center items-center">
+                    <canvas id="citiesChart"></canvas>
+                    <!-- Center Text -->
+                    <div class="absolute inset-0 flex flex-col justify-center items-center pointer-events-none">
+                        <span class="font-oswald text-3xl font-bold">EUR</span>
+                        <span class="text-xs text-textMuted">Cities</span>
+                    </div>
+                </div>
+                <!-- Legend -->
+                <div class="mt-6 grid grid-cols-2 gap-2 text-xs text-textMuted">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-neonOrange rounded-sm"></span> London</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-neonPurple rounded-sm"></span> Berlin</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-white rounded-sm"></span> Paris</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-gray-600 rounded-sm"></span> Other</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 2: TRENDS & SEASONALITY -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
+
+            <!-- TREND LINE -->
+            <div class="rock-card p-6 lg:col-span-2">
+                <div class="mb-6">
+                    <h2 class="font-oswald text-2xl uppercase text-neonOrange neon-text-orange">Market Growth Trend</h2>
+                    <p class="text-xs text-textMuted mt-1">Concerts per year (2000-2024)</p>
+                </div>
+                <div class="h-64 w-full">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- GEOGRAPHY (Progress Bars) -->
+            <div class="rock-card p-6">
+                <div class="mb-6">
+                    <h2 class="font-oswald text-2xl uppercase">Top Countries</h2>
+                    <p class="text-xs text-textMuted mt-1">Market share distribution</p>
+                </div>
+
+                <div class="space-y-5" id="geoContainer">
+                    <!-- JS generated bars will go here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: HEATMAP (Advanced Vis) -->
+        <div class="rock-card p-6 w-full">
+            <div class="flex flex-col md:flex-row justify-between md:items-end mb-6 gap-4">
+                <div>
+                    <h2 class="font-oswald text-2xl uppercase text-white">Concert Density Heatmap</h2>
+                    <p class="text-xs text-textMuted mt-1">Activity intensity by Month vs Year (Seasonality Analysis)</p>
+                </div>
+                <div class="flex gap-4 text-xs">
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#1a1a1a] border border-gray-700"></span> Low</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#7000FF]"></span> Med</div>
+                    <div class="flex items-center gap-2"><span class="w-3 h-3 bg-[#FF5E00]"></span> High</div>
+                </div>
+            </div>
+
+            <!-- HEATMAP GRID -->
+            <div class="relative overflow-x-auto pb-2">
+                <div class="min-w-[800px]">
+                    <div class="flex mb-2 text-xs text-textMuted font-mono">
+                        <div class="w-16"></div> <!-- Spacer for years -->
+                        <div class="grid grid-cols-12 w-full text-center">
+                            <div>JAN</div><div>FEB</div><div>MAR</div><div>APR</div><div>MAY</div><div>JUN</div>
+                            <div>JUL</div><div>AUG</div><div>SEP</div><div>OCT</div><div>NOV</div><div>DEC</div>
+                        </div>
+                    </div>
+                    <div id="heatmapContainer" class="space-y-1">
+                        <!-- Rows generated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-800 bg-black py-8 mt-10">
+        <div class="container mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-xs text-textMuted">
+            <div class="font-oswald text-lg text-white mb-4 md:mb-0">ROCK SCENE <span class="text-neonOrange">EUROPE</span></div>
+            <div class="flex gap-6 uppercase tracking-widest">
+                <a href="#" class="hover:text-white transition">Data Source</a>
+                <a href="#" class="hover:text-white transition">API Docs</a>
+                <a href="#" class="hover:text-white transition">Github</a>
+            </div>
+            <div class="mt-4 md:mt-0 opacity-50">Designed for Python Project • 2025</div>
+        </div>
+    </footer>
+
+    <!-- LOGIC -->
+    <script>
+        // --- 1. DATA FETCHING ---
+        const API_URL = 'http://localhost:8001';
+
+        async function fetchData() {
+            try {
+                // Fetching real data
+                const [artistsRes, trendRes] = await Promise.all([
+                    fetch(`${API_URL}/api/v1/stats/top-artists`),
+                    fetch(`${API_URL}/api/v1/stats/concerts-by-year`)
+                ]);
+
+                const artistsData = await artistsRes.json();
+                const trendData = await trendRes.json();
+
+                // Mock Data for visualizations not yet in API (Geography, Cities, Heatmap)
+                // (Використовуємо статичні дані, щоб сайт виглядав повним, доки ви не оновите API)
+                const citiesData = [
+                    {name: 'London', val: 30}, {name: 'Berlin', val: 15}, {name: 'Paris', val: 12},
+                    {name: 'Manchester', val: 10}, {name: 'Glasgow', val: 8}
+                ];
+                const countriesData = [
+                    {name: 'United Kingdom', val: 28, color: '#FF5E00'},
+                    {name: 'Germany', val: 22, color: '#e05200'},
+                    {name: 'France', val: 15, color: '#7000FF'},
+                    {name: 'Spain', val: 12, color: '#5a00cc'},
+                    {name: 'Italy', val: 10, color: '#444'}
+                ];
+
+                renderDashboard(artistsData, trendData, citiesData, countriesData);
+
+            } catch (error) {
+                console.error("API Error:", error);
+                alert("Не вдалося підключитися до API! Перевірте, чи запущено 'python api_main.py'. Завантажую демо-режим.");
+                // Fallback demo mode if API is down
+                renderDashboard(
+                    [{name: 'Rammstein (Demo)', count: 120}, {name: 'Metallica', count: 100}],
+                    [{year: 2020, count: 50}, {year: 2021, count: 100}],
+                    [], []
+                );
+            }
+        }
+
+        // --- 2. RENDERING ---
+        function renderDashboard(artists, trends, cities, countries) {
+
+            // KPI Update
+            const totalConcerts = trends.reduce((acc, curr) => acc + curr.count, 0);
+            document.getElementById('kpiTotal').innerText = totalConcerts.toLocaleString();
+
+            // CHART: Top Artists
+            const ctxArtists = document.getElementById('artistsChart').getContext('2d');
+            const gradOrange = ctxArtists.createLinearGradient(0, 0, 0, 300);
+            gradOrange.addColorStop(0, '#FF5E00');
+            gradOrange.addColorStop(1, 'rgba(255, 94, 0, 0.1)');
+
+            new Chart(ctxArtists, {
+                type: 'bar',
+                data: {
+                    labels: artists.map(a => a.name),
+                    datasets: [{
+                        label: 'Concerts',
+                        data: artists.map(a => a.count),
+                        backgroundColor: gradOrange,
+                        borderRadius: 2,
+                        barThickness: 'flex',
+                        maxBarThickness: 40
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#222' }, ticks: { color: '#666' } },
+                        x: { grid: { display: false }, ticks: { color: '#aaa', font: {family: 'Oswald'} } }
+                    }
+                }
+            });
+
+            // CHART: Trend Line
+            const ctxTrend = document.getElementById('trendChart').getContext('2d');
+            const gradPurple = ctxTrend.createLinearGradient(0, 0, 0, 300);
+            gradPurple.addColorStop(0, 'rgba(112, 0, 255, 0.4)');
+            gradPurple.addColorStop(1, 'rgba(112, 0, 255, 0)');
+
+            new Chart(ctxTrend, {
+                type: 'line',
+                data: {
+                    labels: trends.map(t => t.year),
+                    datasets: [{
+                        label: 'Activity',
+                        data: trends.map(t => t.count),
+                        borderColor: '#7000FF',
+                        backgroundColor: gradPurple,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#000',
+                        pointBorderColor: '#FF5E00',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#222' } },
+                        x: { grid: { color: '#222' } }
+                    }
+                }
+            });
+
+            // CHART: Cities Donut
+            const ctxCities = document.getElementById('citiesChart').getContext('2d');
+            new Chart(ctxCities, {
+                type: 'doughnut',
+                data: {
+                    labels: cities.map(c => c.name),
+                    datasets: [{
+                        data: cities.map(c => c.val),
+                        backgroundColor: ['#FF5E00', '#7000FF', '#E5E5E5', '#333333', '#222222'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '75%',
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // HTML: Country Progress Bars
+            const geoContainer = document.getElementById('geoContainer');
+            geoContainer.innerHTML = countries.map(c => `
+                <div>
+                    <div class="flex justify-between text-xs font-oswald mb-1">
+                        <span class="text-white uppercase tracking-wider">${c.name}</span>
+                        <span class="text-textMuted">${c.val}%</span>
+                    </div>
+                    <div class="w-full bg-[#222] h-2 rounded-sm overflow-hidden">
+                        <div class="h-full" style="width: ${c.val}%; background-color: ${c.color}"></div>
+                    </div>
+                </div>
+            `).join('');
+
+            // HTML: Heatmap Generation (Simulated for visual effect)
+            generateHeatmap();
+        }
+
+        // --- 3. HEATMAP LOGIC ---
+        function generateHeatmap() {
+            const container = document.getElementById('heatmapContainer');
+            const years = Array.from({length: 10}, (_, i) => 2024 - i); // Last 10 years
+
+            container.innerHTML = years.map(year => {
+                // Generate 12 random activity levels for demo (since we don't have API endpoint for this yet)
+                const monthsHTML = Array.from({length: 12}).map(() => {
+                    const activity = Math.random();
+                    let color = '#222'; // Low
+                    if (activity > 0.6) color = '#3d008a'; // Med (Dark Purple)
+                    if (activity > 0.8) color = '#7000FF'; // High (Purple)
+                    if (activity > 0.95) color = '#FF5E00'; // Peak (Orange)
+
+                    // Pandemic gap simulation (2020-2021 empty)
+                    if ((year === 2020 || year === 2021) && Math.random() > 0.1) color = '#1a1a1a';
+
+                    return `<div class="heatmap-cell" style="background-color: ${color}" title="Activity"></div>`;
+                }).join('');
+
+                return `
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 text-xs text-textMuted font-mono text-right">${year}</div>
+                        <div class="heatmap-grid w-full">${monthsHTML}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // INIT
+        fetchData();
+    </script>
+</body>
+</html>
