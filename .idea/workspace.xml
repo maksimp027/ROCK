@@ -5,24 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="52bc49c1-5a89-43f0-aceb-7e4f8bb1173c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/analytics.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/data_source_mapping.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/data_source_mapping.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/sqldialects.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_crud.py" beforeDir="false" afterPath="$PROJECT_DIR$/api_crud.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_database.py" beforeDir="false" afterPath="$PROJECT_DIR$/api_database.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/api_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api_schemas.py" beforeDir="false" afterPath="$PROJECT_DIR$/api_schemas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/load_to_db.py" beforeDir="false" afterPath="$PROJECT_DIR$/load_to_db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/make_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/make_data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scheme.sql" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,42 +53,47 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Database Script.scheme.sql.executor&quot;: &quot;Run&quot;,
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;Python.analytics.executor&quot;: &quot;Run&quot;,
-    &quot;Python.api_main.executor&quot;: &quot;Debug&quot;,
-    &quot;Python.load_to_db.executor&quot;: &quot;Run&quot;,
-    &quot;Python.make_data.executor&quot;: &quot;Run&quot;,
-    &quot;Python.make_pptx.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/ROCK&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Database Script.scheme.sql.executor": "Run",
+    "DefaultHtmlFileTemplate": "HTML File",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.analytics.executor": "Run",
+    "Python.api_main.executor": "Debug",
+    "Python.load_to_db.executor": "Run",
+    "Python.make_data.executor": "Run",
+    "Python.make_pptx.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "D:/ROCK",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;,
-      &quot;mysql_aurora&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql",
+      "mysql_aurora"
     ],
-    &quot;RunConfigurationTargetLRU&quot;: [
-      &quot;54f6c745-b0b3-4152-b458-1b0c1a24e161/database/\&quot;postgres\&quot;/schema/\&quot;public\&quot;&quot;
+    "RunConfigurationTargetLRU": [
+      "54f6c745-b0b3-4152-b458-1b0c1a24e161/database/\"postgres\"/schema/\"public\""
     ]
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\ROCK" />
+    </key>
+  </component>
   <component name="RunManager" selected="Python.api_main">
     <configuration name="api_main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ROCK" />
@@ -189,7 +178,7 @@
       <workItem from="1765959981222" duration="3557000" />
       <workItem from="1767450339133" duration="3391000" />
       <workItem from="1767535503032" duration="9336000" />
-      <workItem from="1767636174516" duration="4946000" />
+      <workItem from="1767636174516" duration="7377000" />
     </task>
     <servers />
   </component>
