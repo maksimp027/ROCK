@@ -1,208 +1,99 @@
-# Rock Scene Europe | Live Analytics Platform
+# Rock Scene Europe: Live Music Analytics Platform
 
-> **Data-driven insights for the European live music industry**  
-> A full-stack analytics platform that transforms raw concert data into actionable intelligence through automated ETL pipelines, real-time APIs, and visual reporting.
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-CC2927?style=for-the-badge&logo=sqlalchemy&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Seaborn](https://img.shields.io/badge/Seaborn-4C72B0?style=for-the-badge)
+![Pandas](https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white)
 
----
+An End-to-End Data Engineering pipeline and Analytics API that transforms raw, chaotic concert data into actionable business intelligence for the live music industry.
 
-## Project Overview
+## Live Analytics Preview
 
-**Rock Scene Europe** is a production-ready analytics system built for music industry professionals, event organizers, and data enthusiasts. It provides:
+Experience the platform's visual power without setting up the environment.
 
-- **Comprehensive concert database** covering 2000-2024 across major European markets
-- **Real-time REST API** with async PostgreSQL queries for instant insights
-- **Interactive web dashboard** with responsive visualizations
-- **Automated PDF reports** featuring advanced statistical analysis
+**Open Live Interactive Demo:** [https://maksimp027.github.io/ROCK/preview.html](https://maksimp027.github.io/ROCK/preview.html)
 
----
+> Orange-Purple Neon dashboard aesthetic, static portfolio-ready dataset, and zero backend setup required.
 
-## Key Features
+### For Technical Reviewers
 
-### Robust ETL Pipeline
-- **Automated data collection** from Setlist.fm API with rate limiting and error handling
-- **Pydantic v2 validation** ensuring data integrity at ingestion time
-- **SQLAlchemy 2.0 ORM** with modern `Mapped` annotations for type-safe database operations
-- **Intelligent deduplication** using "get-or-create" patterns for artists, venues, and locations
+Read the engineering deep-dive in [`ANALYTICS_SHOWCASE.md`](ANALYTICS_SHOWCASE.md) for ETL architecture decisions, SQLAlchemy 2.0 modeling strategy, and advanced analytical query patterns.
 
-### High-Performance API
-- **Async FastAPI backend** with connection pooling for optimal throughput
-- **Lifespan management** for graceful startup/shutdown of database connections
-- **Complex aggregations** (top artists, geographic distribution, temporal trends)
-- **Built-in Swagger UI** at `/docs` for interactive exploration
+## The Business Value
 
-### Advanced Analytics
-- **Seaborn-powered visualizations**: heatmaps, regression plots, and distribution analysis
-- **PDF report generation** with publication-quality charts
-- **Activity heatmaps** revealing seasonality patterns (2010-2024)
-- **Market penetration analysis** across European cities and countries
+Rock Scene Europe exists to convert noisy external event data into decision-ready insights for:
 
-### Modern Frontend
-- **Responsive dashboard** built with Tailwind CSS
-- **Real-time Chart.js visualizations** with gradient effects and dark theme
-- **KPI cards** displaying live statistics from the API
-- **Professional UI/UX** following design system principles
+- **Tour Promoters** planning cost-efficient, high-demand routes.
+- **Booking Agencies** comparing market saturation across cities and countries.
+- **Music Label Analysts** tracking artist momentum, setlist behavior, and growth trends over time.
 
----
+### 1) Tour Logistics Optimization
+
+The platform analyzes concert density by country, city, month, and year to help teams build better European tour plans, reduce routing friction, and prioritize high-activity markets.
+
+### 2) Trend & Setlist Analysis
+
+Historical data is transformed into artist-level and song-level analytics, enabling teams to detect genre/artist trajectory shifts and forecast ticket sales potential with evidence, not assumptions.
+
+### 3) Automated Executive Reporting
+
+Using `analytics.py` and Seaborn, stakeholders can generate presentation-ready PDF reports with a single operational trigger, accelerating weekly and quarterly reporting cycles.
+
+## Platform Capabilities
+
+- **Production-style ETL flow** from Setlist.fm with validation, filtering, deduplication, and normalization.
+- **Async analytical API** built on FastAPI + SQLAlchemy 2.0 for scalable read workloads.
+- **Typed schemas** powered by Pydantic v2 for contract reliability across ETL and API layers.
+- **Dashboard-ready endpoints** for top artists, top songs, geography distribution, yearly trends, and heatmaps.
+- **Publication-quality analytics** using Pandas, Matplotlib, and Seaborn.
+
+## The Data Architecture
+
+### Phase 1: ETL & Data Cleansing (`make_data.py`, `load_to_db.py`)
+
+- Extracts setlist and concert metadata from Setlist.fm API.
+- Handles external API instability and rate limits.
+- Validates incoming payloads with Pydantic models.
+- Deduplicates artists, countries, cities, and venues.
+- Normalizes dirty nested JSON into relational entities.
+
+### Phase 2: Storage (PostgreSQL + SQLAlchemy 2.0 ORM)
+
+- Stores cleaned data in PostgreSQL with strict schema relationships.
+- Uses SQLAlchemy 2.0 typed models (`Mapped`, `mapped_column`).
+- Enforces referential integrity for analytics-grade consistency.
+
+### Phase 3: The API Gate (`api_main.py`, `api_crud.py`, `api_database.py`)
+
+- Exposes analytical endpoints through FastAPI.
+- Uses async sessions and dependency-injected database access.
+- Serves aggregation-heavy queries for BI and dashboard consumption.
+
+### Phase 4: Reporting Engine (`analytics.py`)
+
+- Executes SQL-backed analytics with Pandas.
+- Builds executive charts with Seaborn and Matplotlib.
+- Exports print-ready PDF reports for business stakeholders.
 
 ## Tech Stack
 
 | Layer | Technologies |
-|-------|-------------|
-| **Backend** | FastAPI 0.115+ with async/await, Uvicorn ASGI server |
-| **Database** | PostgreSQL 15 with asyncpg driver |
-| **ORM** | SQLAlchemy 2.0 (Declarative Base, Mapped annotations) |
-| **Validation** | Pydantic v2 with Settings management |
-| **Data Processing** | Pandas, NumPy |
-| **Visualization** | Matplotlib 3.8+, Seaborn 0.13+ |
-| **Frontend** | HTML5, Tailwind CSS 3.x, Chart.js 4.x |
-| **DevOps** | Docker, Docker Compose |
-| **HTTP Client** | Requests (with retry logic) |
-
----
-
-## Architecture
-
-```
-rock-scene-europe/
-├── api_main.py          # FastAPI application with lifespan hooks
-├── api_crud.py          # Database queries using SQLAlchemy ORM
-├── api_database.py      # Connection pool & session management
-├── api_schemas.py       # Pydantic models for request/response validation
-├── models.py            # SQLAlchemy ORM models (Artist, Concert, Venue, etc.)
-├── load_to_db.py        # ETL script with get-or-create logic
-├── make_data.py         # Data collection from Setlist.fm API
-├── analytics.py         # Seaborn report generation
-├── config.py            # Settings management with Pydantic
-├── index.html           # Frontend dashboard
-├── docker-compose.yml   # Multi-container orchestration
-└── Dockerfile           # API service containerization
-```
-
-**Design Principles:**
-- **Separation of concerns**: API layer, business logic, and data access are isolated
-- **Dependency injection**: Database sessions passed via FastAPI `Depends()`
-- **Configuration as code**: Environment variables managed through Pydantic Settings
-- **Async by default**: All I/O operations use async/await for concurrency
-
----
+|---|---|
+| Backend API | FastAPI, Uvicorn, Lifespan management |
+| Data Access | SQLAlchemy 2.0, asyncpg |
+| Database | PostgreSQL |
+| Validation & Settings | Pydantic v2, Pydantic Settings |
+| Analytics | Pandas, Matplotlib, Seaborn |
+| Frontend | Tailwind CSS, Chart.js |
+| DevOps | Docker, Docker Compose |
 
 ## Quick Start
 
-### Prerequisites
-- Docker 24.0+
-- Docker Compose 2.20+
+### 1) Environment Setup
 
-### Installation
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/maksimp027/ROCK.git
-   cd ROCK
-   ```
-
-2. **Configure environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials and Setlist.fm API key
-   ```
-
-3. **Launch the platform**
-   ```bash
-   docker-compose up --build
-   ```
-
-4. **Access the services**
-   - **Dashboard**: http://localhost:8001 (open `index.html` in browser)
-   - **API Documentation**: http://localhost:8001/docs
-   - **PostgreSQL**: `localhost:5432`
-
-### Data Population
-
-```bash
-# Collect data from Setlist.fm (requires API key in .env)
-python make_data.py
-
-# Load data into PostgreSQL
-python load_to_db.py
-
-# Generate PDF analytics report
-python analytics.py
-```
-
----
-
-## 📡 API Documentation
-
-### Base URL
-```
-http://localhost:8001/api/v1
-```
-
-### Key Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/stats/top-artists` | GET | Top 10 artists by concert count |
-| `/stats/top-songs` | GET | Top 20 most performed songs |
-| `/stats/concerts-by-year` | GET | Annual concert trends |
-| `/stats/geography` | GET | Top countries by event volume |
-| `/stats/heatmap` | GET | Monthly activity density (2010-2024) |
-| `/artists/{mbid}` | GET | Artist details with full concert history |
-| `/concerts/{id}` | GET | Concert details with setlist |
-
-### Example Response
-
-```json
-GET /api/v1/stats/top-artists
-
-[
-  {
-    "name": "Metallica",
-    "count": 342
-  },
-  {
-    "name": "Rammstein",
-    "count": 198
-  }
-]
-```
-
-**Interactive Swagger UI** available at `/docs` for testing all endpoints.
-
----
-
-## Visualizations
-
-### Live Dashboard
-![Dashboard Preview](docs/dashboard-preview.png)
-*Real-time analytics with interactive charts and KPI cards*
-
-### PDF Report Sample
-![PDF Report](docs/pdf-report-preview.png)
-*Professional statistical analysis with Seaborn visualizations*
-
----
-
-## Database Schema
-
-**Core Tables:**
-- `artists` - MusicBrainz ID, name
-- `countries` - ISO 3166-1 alpha-2 codes
-- `cities` - Name + country reference
-- `venues` - Name + city reference
-- `concerts` - Event metadata (date, tour, relationships)
-- `setlistitems` - Song-level data with position and cover flags
-
-**Relationships:**
-- One-to-Many: Country → Cities → Venues → Concerts
-- One-to-Many: Artist → Concerts → SetlistItems
-- Enforced referential integrity with foreign keys
-
----
-
-## Environment Variables
-
-Create a `.env` file with the following:
+Create environment variables (or copy from `.env.example` if present) and make sure these keys exist:
 
 ```env
 DB_USER=postgres
@@ -210,29 +101,85 @@ DB_PASSWORD=your_secure_password
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=rock_concerts
-
-SETLIST_FM_API_KEY=your_api_key_here
+SETLIST_API_KEY=your_setlist_fm_api_key
 ```
 
----
+### 2) Run with Docker Compose (recommended)
 
-## Contributing
+```bash
+docker-compose up --build
+```
 
-Contributions are welcome! Please:
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+After startup:
 
----
+- API: `http://localhost:8001`
+- Swagger UI: `http://localhost:8001/docs`
+- PostgreSQL: `localhost:5432`
 
+<<<<<<< HEAD
 ## Acknowledgments
+=======
+### 3) Run ETL and Reporting Scripts
 
-- **Setlist.fm API** for comprehensive concert data
-- **FastAPI** team for the excellent async framework
-- **SQLAlchemy** for the powerful ORM capabilities
+```bash
+python make_data.py
+python load_to_db.py
+python analytics.py
+```
 
----
+### 4) Run API Locally (without Docker)
 
+```bash
+uvicorn api_main:app --host 0.0.0.0 --port 8001 --reload
+```
+>>>>>>> d9d395e (feat: finalize portfolio release with live preview and technical showcase)
+
+## API Surface (Analytics Endpoints)
+
+Base path:
+
+<<<<<<< HEAD
 **Built with for the rock community by [maksimp027](https://github.com/maksimp027)**
+=======
+```text
+/api/v1
+```
+
+Key endpoints:
+
+- `GET /stats/top-artists`
+- `GET /stats/top-songs`
+- `GET /stats/concerts-by-year`
+- `GET /stats/geography`
+- `GET /stats/cities`
+- `GET /stats/heatmap`
+- `GET /artists/{artist_mbid}`
+- `GET /concerts/{concert_id}`
+
+## Repository Layout
+
+```text
+ROCK/
+├── api_main.py        # FastAPI entrypoint and route layer
+├── api_crud.py        # Analytical query logic
+├── api_database.py    # Async DB session/pool wiring
+├── api_schemas.py     # Pydantic DTOs and external payload schemas
+├── models.py          # SQLAlchemy ORM models
+├── make_data.py       # External API extraction + validation
+├── load_to_db.py      # ETL loading and normalization into PostgreSQL
+├── analytics.py       # PDF analytics/reporting engine
+├── index.html         # Dashboard UI
+├── docker-compose.yml
+└── Dockerfile
+```
+
+## Why This Project Matters
+
+Most live-music data sources are incomplete, inconsistent, and hard to operationalize. Rock Scene Europe demonstrates a practical, business-first approach to Data Engineering:
+
+- turn fragmented third-party API payloads into clean relational datasets,
+- expose trusted metrics through a robust analytics API,
+- and automate insight delivery through stakeholder-friendly reporting artifacts.
+
+It is built as a portfolio-grade platform to showcase production-minded engineering across ETL, data modeling, API architecture, and analytics delivery.
+>>>>>>> d9d395e (feat: finalize portfolio release with live preview and technical showcase)

@@ -1,0 +1,29 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache/artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# IDE/editor folders
+.idea/
+.vscode/
+
+# Logs and local outputs
+*.log
+rock_analytics_seaborn.pdf
+plots/*.pdf
+
+# Node artifacts (if frontend tooling is used)
+node_modules/
+
