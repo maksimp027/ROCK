@@ -132,13 +132,11 @@ python analytics.py
 ```bash
 uvicorn api_main:app --host 0.0.0.0 --port 8001 --reload
 ```
->>>>>>> d9d395e (feat: finalize portfolio release with live preview and technical showcase)
 
 ## API Surface (Analytics Endpoints)
 
 Base path:
 
-<<<<<<< HEAD
 **Built with for the rock community by [maksimp027](https://github.com/maksimp027)**
 =======
 ```text
@@ -182,4 +180,3 @@ Most live-music data sources are incomplete, inconsistent, and hard to operation
 - and automate insight delivery through stakeholder-friendly reporting artifacts.
 
 It is built as a portfolio-grade platform to showcase production-minded engineering across ETL, data modeling, API architecture, and analytics delivery.
->>>>>>> d9d395e (feat: finalize portfolio release with live preview and technical showcase)
